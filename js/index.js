@@ -65,23 +65,31 @@ const arr = [
   ];
 
   const gallery = document.querySelector(".gallery");
-  console.log(gallery);
+  const modal = document.querySelector(".lightbox");
+  const image = document.querySelector(".lightbox__image");
+  const button = document.querySelector('[data-action="close-lightbox"]')
+  
 
   for (let item of arr) {
-      console.log(item);
     gallery.insertAdjacentHTML("beforeend", `<li class="gallery__item"><a class="gallery__link" href="${item.original}"><img class="gallery__image" src="${item.preview}" data-source="${item.original}" alt="${item.description}" /></a></li>`);
   };
 
-//   <li class="gallery__item">
-//   <a
-//     class="gallery__link"
-//     href="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546_1280.jpg"
-//   >
-//     <img
-//       class="gallery__image"
-//       src="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546__340.jpg"
-//       data-source="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546_1280.jpg"
-//       alt="Tulips"
-//     />
-//   </a>
-// </li>
+  const openModal = function(event) {
+      modal.classList.add("is-open");
+      event.preventDefault();
+      const source = event.target.dataset.source;
+      toggleAttribute(source);
+  };
+
+  const closeModal = function(event) {
+      modal.classList.remove("is-open");
+      toggleAttribute();
+  };
+
+  const toggleAttribute = function (attr = "") {
+    attr ? image.setAttribute("src", attr) : image.removeAttribute("src");
+  };
+
+  gallery.addEventListener("click", openModal);
+  button.addEventListener("click", closeModal);
+
