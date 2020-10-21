@@ -67,11 +67,30 @@ const arr = [
   const gallery = document.querySelector(".gallery");
   const modal = document.querySelector(".lightbox");
   const image = document.querySelector(".lightbox__image");
-  const button = document.querySelector('[data-action="close-lightbox"]')
+  const button = document.querySelector('[data-action="close-lightbox"]');
+  const backDrop = document.querySelector(".js-lightbox");
   
 
   for (let item of arr) {
     gallery.insertAdjacentHTML("beforeend", `<li class="gallery__item"><a class="gallery__link" href="${item.original}"><img class="gallery__image" src="${item.preview}" data-source="${item.original}" alt="${item.description}" /></a></li>`);
+  };
+
+  const left = function() {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].original === image.getAttribute("src")) {
+        image.setAttribute("src", arr[i - 1].original);
+        break;
+      };
+    };
+  };
+
+  const right = function() {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].original === image.getAttribute("src")) {
+        image.setAttribute("src", arr[i + 1].original);
+        break;
+      };
+    };
   };
 
   const openModal = function(event) {
@@ -79,11 +98,34 @@ const arr = [
       event.preventDefault();
       const source = event.target.dataset.source;
       toggleAttribute(source);
+      button.addEventListener("click", closeModal);
+      backDrop.addEventListener("click", (e) => {if (e.target !== image) {closeModal()}});
+      document.addEventListener("keydown", function(e) {
+        const key = e.key;
+        switch (key) {
+          case "Escape":
+            closeModal();
+            break;
+
+            case "ArrowLeft":
+              left();
+              break;
+        
+            case "ArrowRight":
+              right();
+              break;
+            
+              default:
+                break;
+          }
+      });
   };
 
   const closeModal = function(event) {
       modal.classList.remove("is-open");
       toggleAttribute();
+      button.removeEventListener("click", closeModal);
+      backDrop.removeEventListener("click", closeModal);
   };
 
   const toggleAttribute = function (attr = "") {
@@ -91,5 +133,4 @@ const arr = [
   };
 
   gallery.addEventListener("click", openModal);
-  button.addEventListener("click", closeModal);
 
