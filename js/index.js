@@ -68,7 +68,8 @@ const arr = [
   const modal = document.querySelector(".lightbox");
   const image = document.querySelector(".lightbox__image");
   const button = document.querySelector('[data-action="close-lightbox"]');
-  const backDrop = document.querySelector(".js-lightbox");
+  const backDrop = document.querySelector(".lightbox__overlay");
+  let index = 0;
   
 
   for (let item of arr) {
@@ -76,35 +77,22 @@ const arr = [
   };
 
   const left = function() {
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].original === image.getAttribute("src")) {
-        image.setAttribute("src", arr[i - 1].original);
-        break;
-      };
-    };
+    image.setAttribute("src", arr[index - 1].original);
+    index -= 1;
   };
 
   const right = function() {
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].original === image.getAttribute("src")) {
-        image.setAttribute("src", arr[i + 1].original);
-        break;
-      };
-    };
+    image.setAttribute("src", arr[index + 1].original);
+    index += 1;
   };
 
-  const openModal = function(event) {
-      modal.classList.add("is-open");
-      event.preventDefault();
-      const source = event.target.dataset.source;
-      toggleAttribute(source);
-      button.addEventListener("click", closeModal);
-      backDrop.addEventListener("click", (e) => {if (e.target !== image) {closeModal()}});
-      document.addEventListener("keydown", function(e) {
-        const key = e.key;
+  const keydown = function(e) {
+    const key = e.key;
         switch (key) {
           case "Escape":
-            closeModal();
+            modal.classList.remove("is-open");
+            toggleAttribute();
+            modal.removeEventListener("click", modalClose);
             break;
 
             case "ArrowLeft":
@@ -117,15 +105,32 @@ const arr = [
             
               default:
                 break;
-          }
-      });
+          };
+  };
+
+
+
+  const openModal = function(event) {
+      modal.classList.add("is-open");
+      event.preventDefault();
+      const source = event.target.dataset.source;
+      toggleAttribute(source);
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].original === image.getAttribute("src")) {
+          index = i;
+          break;
+        };
+      };
+      modal.addEventListener("click", closeModal);
+      document.addEventListener("keydown", keydown);
   };
 
   const closeModal = function(event) {
+    if(event.target === button || event.target === backDrop) {
       modal.classList.remove("is-open");
       toggleAttribute();
-      button.removeEventListener("click", closeModal);
-      backDrop.removeEventListener("click", closeModal);
+      modal.removeEventListener("click", modalClose);
+    };
   };
 
   const toggleAttribute = function (attr = "") {
